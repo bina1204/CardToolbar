@@ -1,8 +1,12 @@
 package com.gsbina.cardtoolbar;
 
+import android.graphics.Color;
+import android.graphics.PorterDuff;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v7.app.ActionBar;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -22,6 +26,29 @@ public class MainActivity extends AppCompatActivity
 		setContentView(R.layout.activity_main);
 		Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
 		setSupportActionBar(toolbar);
+		if (hasMenubar()) {
+			Toolbar menubar = (Toolbar) findViewById(R.id.menubar);
+			ActionBar actionBar = getSupportActionBar();
+			if (actionBar != null) {
+				// Show title
+				menubar.setTitle(actionBar.getTitle());
+				actionBar.setTitle(null);
+
+				// Create menu
+				menubar.inflateMenu(R.menu.main);
+				menubar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
+					@Override
+					public boolean onMenuItemClick(MenuItem item) {
+						return onOptionsItemSelected(item);
+					}
+				});
+
+				// Change menu icon color
+				Drawable icon = menubar.getMenu().findItem(R.id.action_module).getIcon();
+				icon.setTint(Color.GRAY);
+				icon.setTintMode(PorterDuff.Mode.SRC_ATOP);
+			}
+		}
 
 		FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
 		fab.setOnClickListener(new View.OnClickListener() {
@@ -55,7 +82,9 @@ public class MainActivity extends AppCompatActivity
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		// Inflate the menu; this adds items to the action bar if it is present.
-		getMenuInflater().inflate(R.menu.main, menu);
+		if (!hasMenubar()) {
+			getMenuInflater().inflate(R.menu.main, menu);
+		}
 		return true;
 	}
 
@@ -97,5 +126,9 @@ public class MainActivity extends AppCompatActivity
 		DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
 		drawer.closeDrawer(GravityCompat.START);
 		return true;
+	}
+
+	private boolean hasMenubar() {
+		return findViewById(R.id.menubar) != null;
 	}
 }
